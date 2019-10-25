@@ -7,6 +7,10 @@ class SucursalInline(admin.TabularInline):
     model = Sucursal
     extra = 0
 
+class BitacoraInline(admin.TabularInline):
+    model = Bitacora
+    extra = 0
+
 admin.site.register(Bitacora)
 
 admin.site.register(Producto)
@@ -19,7 +23,9 @@ admin.site.register(Persona)
 
 admin.site.register(Sucursal)
 
-admin.site.register(Reparaciones)
+@admin.register(Reparaciones)
+class ReparacionesAdmin(admin.ModelAdmin):
+    inlines = [BitacoraInline, ]
 
 admin.site.register(Empleado)
 

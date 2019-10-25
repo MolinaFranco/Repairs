@@ -49,19 +49,18 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+class Reparaciones(models.Model):
+    fecha_ingreso = models.DateField()
+    fecha_estimada = models.DateField()
+    descripcion_reparacion = models.TextField()
+    producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
 
 class Bitacora(models.Model):
     fecha = models.DateField()
     descripcion_trabajo = models.TextField()
     compras = models.TextField()
     gastos = models.PositiveIntegerField()
-
-class Reparaciones(models.Model):
-    fecha_ingreso = models.DateField()
-    fecha_estimada = models.DateField()
-    descripcion_reparacion = models.TextField()
-    producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
-    bitacora = models.ForeignKey(Bitacora, on_delete= models.CASCADE)
+    reparacion = models.ForeignKey(Reparaciones, on_delete= models.CASCADE)
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
