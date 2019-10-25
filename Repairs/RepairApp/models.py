@@ -29,7 +29,6 @@ class Bitacora(models.Model):
     descripcion_trabajo = models.TextField()
     compras = models.TextField()
     gastos = models.PositiveIntegerField()
-    reparacion = models.ForeignKey(Reparaciones, on_delete= models.CASCADE)
 
 
 class Reparaciones(models.Model):
