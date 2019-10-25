@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from RepairApp.models import Producto
+from RepairApp.models import *
 
 # Register your models here.
 
-admin.site.register(Producto)
+admin.site.register(Bitacora)
