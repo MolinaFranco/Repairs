@@ -29,6 +29,7 @@ class Bitacora(models.Model):
     descripcion_trabajo = models.TextField()
     compras = models.TextField()
     gastos = models.PositiveIntegerField()
+<<<<<<< HEAD
     reparacion = models.ForeignKey(Reparaciones, on_delete= models.CASCADE)
 
 class Reparaciones(models.Model):
@@ -38,6 +39,8 @@ class Reparaciones(models.Model):
     producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
     bitacora = models.ForeignKey(Bitacora, on_delete= models.CASCADE)
 
+=======
+>>>>>>> 9ff6817d019c39421f4d05535108adc68ec1606d
 
 class Producto(models.Model):
 
@@ -63,6 +66,14 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+class Reparaciones(models.Model):
+    fecha_ingreso = models.DateField()
+    fecha_estimada = models.DateField()
+    descripcion_reparacion = models.TextField()
+    producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
+    bitacora = models.ForeignKey(Bitacora, on_delete= models.CASCADE)
 
 
 class Sucursal(models.Model):
