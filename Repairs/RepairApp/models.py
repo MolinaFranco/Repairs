@@ -10,24 +10,34 @@ class Persona(models.Model):
     direccion =  models.CharField(max_length=100)
     telefono =  models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.nombre + " " + self.apellido
 
 class Particular(models.Model):
-    pass
+    persona = models.ForeignKey(Persona, on_delete= models.CASCADE)
+
+    def __str__(self):
+        return self.persona
 
 class Empleado(models.Model):
-    pass
+    persona = models.ForeignKey(Persona, on_delete= models.CASCADE)
+    def __str__(self):
+        return self.persona
 
 class Bitacora(models.Model):
     fecha = models.DateField()
     descripcion_trabajo = models.TextField()
     compras = models.TextField()
     gastos = models.PositiveIntegerField()
+    reparacion = models.ForeignKey(Reparaciones, on_delete= models.CASCADE)
 
 
 class Reparaciones(models.Model):
     fecha_ingreso = models.DateField()
     fecha_estimada = models.DateField()
     descripcion_reparacion = models.TextField()
+    producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
+    bitacora = models.ForeignKey(Bitacora, on_delete= models.CASCADE)
 
 
 class Producto(models.Model):
@@ -52,13 +62,20 @@ class Producto(models.Model):
     presupuesto = models.PositiveIntegerField()
     estado = models.CharField(max_length=1, choices=ESTADOS)
 
+    def __str__(self):
+        return self.nombre
+
 
 class Sucursal(models.Model):
     direccion = models.CharField(max_length=100)
     telefono = models.CharField(max_length=100)
-
+    
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
     dueño = models.CharField(max_length=100)
     CUIT = models.CharField(max_length=100)
+    sucursal = models.ForeignKey(Sucursal, on_delete= models.CASCADE)
+
+    def __str__(self):
+        return self.nombre
