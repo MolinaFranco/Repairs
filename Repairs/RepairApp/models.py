@@ -31,7 +31,6 @@ class Bitacora(models.Model):
     gastos = models.PositiveIntegerField()
     reparacion = models.ForeignKey(Reparaciones, on_delete= models.CASCADE)
 
-
 class Reparaciones(models.Model):
     fecha_ingreso = models.DateField()
     fecha_estimada = models.DateField()
@@ -69,7 +68,7 @@ class Producto(models.Model):
 class Sucursal(models.Model):
     direccion = models.CharField(max_length=100)
     telefono = models.CharField(max_length=100)
-    
+
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
