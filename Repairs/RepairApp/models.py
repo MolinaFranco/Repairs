@@ -11,23 +11,26 @@ class Persona(models.Model):
     telefono =  models.CharField(max_length=30)
 
 
+
 class Particular(models.Model):
-    pass
+    persona = models.ForeignKey(Persona, on_delete= models.CASCADE)
 
 class Empleado(models.Model):
-    pass
+    persona = models.ForeignKey(Persona, on_delete= models.CASCADE)
 
 class Bitacora(models.Model):
     fecha = models.DateField()
     descripcion_trabajo = models.TextField()
     compras = models.TextField()
     gastos = models.PositiveIntegerField()
+    reparacion = models.ForeignKey(Reparaciones, on_delete= models.CASCADE)
 
 
 class Reparaciones(models.Model):
     fecha_ingreso = models.DateField()
     fecha_estimada = models.DateField()
     descripcion_reparacion = models.TextField()
+    producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
 
 
 class Producto(models.Model):
@@ -56,6 +59,7 @@ class Producto(models.Model):
 class Sucursal(models.Model):
     direccion = models.CharField(max_length=100)
     telefono = models.CharField(max_length=100)
+    empresa = models.ForeignKey(Empresa, on_delete= models.CASCADE)
 
 
 class Empresa(models.Model):
