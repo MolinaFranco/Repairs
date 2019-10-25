@@ -24,24 +24,6 @@ class Empleado(models.Model):
     def __str__(self):
         return self.persona
 
-class Bitacora(models.Model):
-    fecha = models.DateField()
-    descripcion_trabajo = models.TextField()
-    compras = models.TextField()
-    gastos = models.PositiveIntegerField()
-<<<<<<< HEAD
-    reparacion = models.ForeignKey(Reparaciones, on_delete= models.CASCADE)
-
-class Reparaciones(models.Model):
-    fecha_ingreso = models.DateField()
-    fecha_estimada = models.DateField()
-    descripcion_reparacion = models.TextField()
-    producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
-    bitacora = models.ForeignKey(Bitacora, on_delete= models.CASCADE)
-
-=======
->>>>>>> 9ff6817d019c39421f4d05535108adc68ec1606d
-
 class Producto(models.Model):
 
     ESTADOS = (
@@ -68,6 +50,12 @@ class Producto(models.Model):
         return self.nombre
 
 
+class Bitacora(models.Model):
+    fecha = models.DateField()
+    descripcion_trabajo = models.TextField()
+    compras = models.TextField()
+    gastos = models.PositiveIntegerField()
+
 class Reparaciones(models.Model):
     fecha_ingreso = models.DateField()
     fecha_estimada = models.DateField()
@@ -75,17 +63,16 @@ class Reparaciones(models.Model):
     producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
     bitacora = models.ForeignKey(Bitacora, on_delete= models.CASCADE)
 
-
-class Sucursal(models.Model):
-    direccion = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=100)
-
-
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
     dueño = models.CharField(max_length=100)
     CUIT = models.CharField(max_length=100)
-    sucursal = models.ForeignKey(Sucursal, on_delete= models.CASCADE)
 
     def __str__(self):
         return self.nombre
+
+class Sucursal(models.Model):
+    direccion = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=100)
+    empresa = models.ForeignKey(Empresa, on_delete= models.CASCADE)
+
