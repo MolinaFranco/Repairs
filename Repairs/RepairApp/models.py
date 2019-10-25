@@ -37,6 +37,7 @@ class Reparaciones(models.Model):
     fecha_estimada = models.DateField()
     descripcion_reparacion = models.TextField()
     producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
+    bitacora = models.ForeignKey(Bitacora, on_delete= models.CASCADE)
 
 
 class Producto(models.Model):
@@ -68,13 +69,13 @@ class Producto(models.Model):
 class Sucursal(models.Model):
     direccion = models.CharField(max_length=100)
     telefono = models.CharField(max_length=100)
-    empresa = models.ForeignKey(Empresa, on_delete= models.CASCADE)
-
+    
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
     dueño = models.CharField(max_length=100)
     CUIT = models.CharField(max_length=100)
-    
+    sucursal = models.ForeignKey(Sucursal, on_delete= models.CASCADE)
+
     def __str__(self):
         return self.nombre
