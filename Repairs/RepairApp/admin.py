@@ -1,32 +1,22 @@
 from django.contrib import admin
-from RepairApp.models import *
+from .models import *
+from django.contrib.auth.models import User, Group
 
-# Register your models here.
 
-class SucursalInline(admin.TabularInline):
-    model = Sucursal
+class UserInline(admin.TabularInline):
+    model = User
     extra = 0
+class PerfilAdmin(admin.ModelAdmin):
+    inlines = [UserInline]
 
-class BitacoraInline(admin.TabularInline):
-    model = Bitacora
-    extra = 0
+
+
+#admin.site.unregister(User)
+admin.site.unregister(Group)
 
 admin.site.register(Bitacora)
-
+admin.site.register(Perfil)
+admin.site.register(SucursalOParticular)
+admin.site.register(Reparacion)
 admin.site.register(Producto)
-
-@admin.register(Empresa)
-class EmpresaAdmin(admin.ModelAdmin):
-    inlines = [SucursalInline, ]
-
-admin.site.register(Persona)
-
-admin.site.register(Sucursal)
-
-@admin.register(Reparaciones)
-class ReparacionesAdmin(admin.ModelAdmin):
-    inlines = [BitacoraInline, ]
-
-admin.site.register(Empleado)
-
-admin.site.register(Particular)
+admin.site.register(Empresa)
