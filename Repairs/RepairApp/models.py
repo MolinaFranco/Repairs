@@ -61,11 +61,9 @@ class Perfil(models.Model):
     class Meta:
         verbose_name_plural = 'Perfiles'
     NIVELES = [
-        ('1', 'Técnico'),
-        ('2', 'Dueño'),
-        ('3', 'Empleado de Sucursal'),]
+        ('1', 'Dueño'),
+        ('2', 'Empleado de Sucursal'),]
 
     usuario = models.OneToOneField(User, on_delete = models.CASCADE)
     sucursal_o_particular = models.ForeignKey(SucursalOParticular, on_delete = models.CASCADE)
     nivel = models.CharField(max_length=1, choices=NIVELES, default = '3')
-    
