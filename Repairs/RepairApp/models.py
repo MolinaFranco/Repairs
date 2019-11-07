@@ -1,5 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser, PermissionsMixin, AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import Group
+from django.utils.translation import gettext_lazy as _
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
@@ -9,7 +11,7 @@ class Empresa(models.Model):
         return self.nombre
 
 class SucursalOParticular(models.Model):
-    nombre = models.CharField(max_length=100, verbose_name='Nombre Completo')
+    nombre = models.CharField(max_length=100, verbose_name='Nombre')
     empresa = models.ForeignKey(Empresa, on_delete = models.CASCADE, null = True, blank = True)
     direccion = models.CharField(max_length=200)
     telefono = models.CharField(max_length=30)
@@ -57,13 +59,81 @@ class Bitacora(models.Model):
     def __str__(self):
         return self.titulo
 
-class Perfil(models.Model):
-    class Meta:
-        verbose_name_plural = 'Perfiles'
-    NIVELES = [
-        ('1', 'Dueño'),
-        ('2', 'Empleado de Sucursal'),]
 
-    usuario = models.OneToOneField(User, on_delete = models.CASCADE)
-    sucursal_o_particular = models.ForeignKey(SucursalOParticular, on_delete = models.CASCADE)
-    nivel = models.CharField(max_length=1, choices=NIVELES, default = '3')
+class MyUserManager(BaseUserManager):
+    def create_user(self, email, nivel, password = None):
+        if not email:
+            raise ValueError('Los usuarios deben tener una contraseña')
+        user_obj = self.model(
+            email = self.normalize_email(email)
+            )
+        user_obj.set_password(password)
+        if nivel == '2' or nivel == '3':
+            grupo = Group.objects.get(name='Vidente') 
+            grupo.user_set.add(user_obj)
+        elif nivel == '1':
+            grupo = Group.objects.get(name= 'Técnico')
+            grupo.user_set.add(user_obj)
+        user_obj.is_staff = True
+        user_obj.is_active = True
+        user_obj.save(using=self.db)
+        return user_obj
+    def create_superuser(self, email, password = None):
+        user_obj = self.model(
+            email = self.normalize_email(email))
+        user_obj.set_password(password)
+        user_obj.save(using=self.db)
+        return user_obj
+
+
+class MyUser(AbstractBaseUser):
+    objects = MyUserManager()
+
+    class Meta:
+        verbose_name = 'Usuario'
+        verbose_name_plural = 'Usuarios'
+    #NIVELES = [
+     #   ('1', 'Técnico'),
+      #  ('2', 'Dueño'),
+       # ('3', 'Empleado de Sucursal')]
+
+    sucursal_o_particular = models.ForeignKey(SucursalOParticular, on_delete = models.CASCADE, null = True, blank = True)
+    #nivel = models.CharField(max_length=1, choices=NIVELES, null = True)
+    active = models.BooleanField(verbose_name = 'Está activo', default = True)# Está activo
+    staff = models.BooleanField(default = True)
+    admin = models.BooleanField(verbose_name = 'Es administrador', default = False)# es admin
+    email = models.EmailField(verbose_name = 'E-mail', unique = True)
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return self.email
+
+    def get_email(self):
+        return self.email
+    
+    #def get_nivel(self):
+     #   return self.nivel
+    
+    def get_username(self):
+        return self.get_email()
+
+    def get_short_name(self):
+        return self.email
+    
+    def get_full_name(self):
+        return self.email
+    
+    @property
+    def is_staff(self):
+        return self.staff
+    
+    @property
+    def is_active(self):
+        return self.active
+   # def has_perm(self, perm, obj=None):
+     #   return True
+   # def has_module_perms(self, app_label):
+    #    return True
+
