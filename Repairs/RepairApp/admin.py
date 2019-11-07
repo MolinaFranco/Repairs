@@ -6,10 +6,30 @@ class ProductoInline(admin.TabularInline):
     model = Producto
     extra = 0
 
+class BitacoraInline(admin.TabularInline):
+    model = Bitacora
+    extra = 0
+
+class SucursalOParticularInline(admin.TabularInline):
+    model = SucursalOParticular
+    extra = 0
+
+class ReparacionInline(admin.TabularInline):
+    model = Reparacion
+    extra = 0
+
 class SucursalOParticularAdmin (admin.ModelAdmin):
     inlines = [ProductoInline]
+
 class ProductoAdmin(admin.ModelAdmin):
     list_display = ['sucursal_o_particular']
+    inlines = [ReparacionInline]
+
+class ReparacionAdmin(admin.ModelAdmin):
+    inlines = [BitacoraInline]
+
+class EmpresaAdmin(admin.ModelAdmin):
+    inlines = [SucursalOParticularInline]
     
     #def get_queryset(self, request):
      #   qs = super(ProductoAdmin, self).get_queryset(request)
@@ -27,6 +47,6 @@ class ProductoAdmin(admin.ModelAdmin):
 admin.site.register(MyUser)
 admin.site.register(Bitacora)
 admin.site.register(SucursalOParticular,SucursalOParticularAdmin)
-admin.site.register(Reparacion)
+admin.site.register(Reparacion,ReparacionAdmin)
 admin.site.register(Producto,ProductoAdmin)
-admin.site.register(Empresa)
+admin.site.register(Empresa,EmpresaAdmin)

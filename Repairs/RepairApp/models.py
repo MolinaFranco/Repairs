@@ -132,8 +132,10 @@ class MyUser(AbstractBaseUser):
     @property
     def is_active(self):
         return self.active
-   # def has_perm(self, perm, obj=None):
-     #   return True
-   # def has_module_perms(self, app_label):
-    #    return True
+    
+    def has_perm(self, perm, obj=None):
+        return True
+    
+    def has_module_perms(self, app_label):
+        return True
 
