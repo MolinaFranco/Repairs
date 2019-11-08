@@ -72,14 +72,6 @@ class MyUserAdmin(admin.ModelAdmin):
 
         #return qs.filter(sucursal_o_particular = request.user.sucursal_o_particular)
 
-class MyUserAdmin(admin.ModelAdmin):
-
-    def get_readonly_fields(self, request, obj=None):
-        if obj:
-            return ['password']
-        else:
-            return []
-
 class MoUserAdmin(admin.ModelAdmin):
     add_form_template = 'admin/auth/user/add_form.html'
     change_user_password_template = None
@@ -247,15 +239,9 @@ class MoUserAdmin(admin.ModelAdmin):
 
 
 #admin.site.unregister(User)
-<<<<<<< HEAD
-admin.site.unregister(Group)
-admin.site.register(MyUser, MoUserAdmin)
-admin.site.register(Bitacora)
-=======
 #admin.site.unregister(Group)
-admin.site.register(MyUser, MyUserAdmin)
+admin.site.register(MyUser, MoUserAdmin)
 admin.site.register(Bitacora,BitacoraAdmin)
->>>>>>> 5408d38235e3692beccb276a66f0088092c52197
 admin.site.register(SucursalOParticular,SucursalOParticularAdmin)
 admin.site.register(Reparacion,ReparacionAdmin)
 admin.site.register(Producto,ProductoAdmin)

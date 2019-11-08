@@ -137,24 +137,4 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         """Return the short name for the user."""
         return self.email
-<<<<<<< HEAD
-=======
-    
-    def get_full_name(self):
-        return self.email
-    
-    @property
-    def is_staff(self):
-        return self.staff
-    
-    @property
-    def is_active(self):
-        return self.active
-    
-    def has_perm(self, perm, obj=None):
-        return True
-    
-    def has_module_perms(self, app_label):
-        return True
->>>>>>> 5408d38235e3692beccb276a66f0088092c52197
 
