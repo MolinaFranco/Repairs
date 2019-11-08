@@ -29,10 +29,41 @@ class ProductoInline(admin.TabularInline):
     model = Producto
     extra = 0
 
+class BitacoraInline(admin.TabularInline):
+    model = Bitacora
+    extra = 0
+
+class SucursalOParticularInline(admin.TabularInline):
+    model = SucursalOParticular
+    extra = 0
+
+class ReparacionInline(admin.TabularInline):
+    model = Reparacion
+    extra = 0
+
 class SucursalOParticularAdmin (admin.ModelAdmin):
+    list_display = ('nombre', 'empresa', 'direccion', 'telefono')
     inlines = [ProductoInline]
+
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ['sucursal_o_particular']
+    list_display = ('sucursal_o_particular', 'nombre', 'modelo', 'diagnostico', 'presupuesto_detallado', 'estado')
+    inlines = [ReparacionInline]
+
+class ReparacionAdmin(admin.ModelAdmin):
+    list_display = ('fecha_ingreso', 'fecha_estimada', 'descripcion_reparacion', 'producto')
+    inlines = [BitacoraInline]
+
+class EmpresaAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'cuit')
+    inlines = [SucursalOParticularInline]
+
+class BitacoraAdmin(admin.ModelAdmin):
+    list_display = ('fecha', 'titulo', 'descripcion_trabajo', 'reparacion')
+
+class MyUserAdmin(admin.ModelAdmin):
+    list_display = ('email', 'sucursal_o_particular', 'active', 'admin')
+
+
     
     #def get_queryset(self, request):
      #   qs = super(ProductoAdmin, self).get_queryset(request)
@@ -216,10 +247,16 @@ class MoUserAdmin(admin.ModelAdmin):
 
 
 #admin.site.unregister(User)
+<<<<<<< HEAD
 admin.site.unregister(Group)
 admin.site.register(MyUser, MoUserAdmin)
 admin.site.register(Bitacora)
+=======
+#admin.site.unregister(Group)
+admin.site.register(MyUser, MyUserAdmin)
+admin.site.register(Bitacora,BitacoraAdmin)
+>>>>>>> 5408d38235e3692beccb276a66f0088092c52197
 admin.site.register(SucursalOParticular,SucursalOParticularAdmin)
-admin.site.register(Reparacion)
+admin.site.register(Reparacion,ReparacionAdmin)
 admin.site.register(Producto,ProductoAdmin)
-admin.site.register(Empresa)
+admin.site.register(Empresa,EmpresaAdmin)
