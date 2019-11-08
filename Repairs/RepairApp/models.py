@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
-    CUIT = models.CharField(max_length=100)
+    cuit = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nombre
