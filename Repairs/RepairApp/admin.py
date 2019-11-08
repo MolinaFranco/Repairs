@@ -20,9 +20,16 @@ from django.utils.html import escape
 from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Count
+from django.db.models.functions import TruncDay
+import json
 
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
+
+admin.site.site_header = _("Repairs Administration")
+admin.site.site_title = _("My Repairs Admin")
 
 
 class ProductoInline(admin.TabularInline):
@@ -52,6 +59,21 @@ class ProductoAdmin(admin.ModelAdmin):
 class ReparacionAdmin(admin.ModelAdmin):
     list_display = ('fecha_ingreso', 'fecha_estimada', 'descripcion_reparacion', 'producto')
     inlines = [BitacoraInline]
+    change_list_template = 'graficos.html'
+
+    def changelist_view(self, request, extra_context=None):
+
+        chart_data = (
+            Reparacion.objects.annotate(date=TruncDay("fecha_estimada"))
+            .values("date")
+            .annotate(y=Count("id"))
+            .order_by("-date")
+        )
+
+        as_json = json.dumps(list(chart_data), cls=DjangoJSONEncoder)
+        extra_context = extra_context or {"chart_data": as_json}
+
+        return super().changelist_view(request, extra_context=extra_context)
 
 class EmpresaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'cuit')
@@ -64,7 +86,7 @@ class MyUserAdmin(admin.ModelAdmin):
     list_display = ('email', 'sucursal_o_particular', 'active', 'admin')
 
 
-    
+
     #def get_queryset(self, request):
      #   qs = super(ProductoAdmin, self).get_queryset(request)
       #  if request.user.is_superuser or User.objects.filter(pk=request.user.id, groups__name='Técnico').exists():
