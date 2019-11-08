@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser, PermissionsMixin, AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import Group
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
@@ -63,7 +65,7 @@ class Bitacora(models.Model):
 class MyUserManager(BaseUserManager):
     def create_user(self, email, nivel, password = None):
         if not email:
-            raise ValueError('Los usuarios deben tener una contraseña')
+            raise ValueError('Los usuarios deben tener una un mail')
         user_obj = self.model(
             email = self.normalize_email(email)
             )
@@ -82,11 +84,12 @@ class MyUserManager(BaseUserManager):
         user_obj = self.model(
             email = self.normalize_email(email))
         user_obj.set_password(password)
+        user_obj.is_superuser = True
         user_obj.save(using=self.db)
         return user_obj
 
 
-class MyUser(AbstractBaseUser):
+class MyUser(AbstractBaseUser, PermissionsMixin):
     objects = MyUserManager()
 
     class Meta:
@@ -99,41 +102,39 @@ class MyUser(AbstractBaseUser):
 
     sucursal_o_particular = models.ForeignKey(SucursalOParticular, on_delete = models.CASCADE, null = True, blank = True)
     #nivel = models.CharField(max_length=1, choices=NIVELES, null = True)
-    active = models.BooleanField(verbose_name = 'Está activo', default = True)# Está activo
-    staff = models.BooleanField(default = True)
-    admin = models.BooleanField(verbose_name = 'Es administrador', default = False)# es admin
-    email = models.EmailField(verbose_name = 'E-mail', unique = True)
-    
+
+    email = models.EmailField(_('email address'), blank=False, unique = True)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=True,
+        help_text=_('Puede loggearse en esta página.'),
+    )
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Quitar este parámetro en lugar de borrar cuentas'
+        ),
+    )
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    objects = MyUserManager()
+
+    EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    def __str__(self):
-        return self.email
+    def clean(self):
+        super().clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
 
-    def get_email(self):
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
         return self.email
-    
-    #def get_nivel(self):
-     #   return self.nivel
-    
-    def get_username(self):
-        return self.get_email()
 
     def get_short_name(self):
+        """Return the short name for the user."""
         return self.email
-    
-    def get_full_name(self):
-        return self.email
-    
-    @property
-    def is_staff(self):
-        return self.staff
-    
-    @property
-    def is_active(self):
-        return self.active
-   # def has_perm(self, perm, obj=None):
-     #   return True
-   # def has_module_perms(self, app_label):
-    #    return True
 
