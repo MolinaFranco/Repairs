@@ -94,6 +94,14 @@ class ProductoAdmin(admin.ModelAdmin):
                 return('nombre', 'modelo', 'estado')
         else:
             return ('sucursal_o_particular','nombre','modelo','estado', 'presupuesto_detallado','diagnostico')
+
+    def get_queryset(self, request):
+        qs = super(ProductoAdmin, self).get_queryset(request)
+        if request.user.is_superuser or request.user.nivel == '1':
+            return qs
+
+        return qs.filter(sucursal_o_particular = request.user.sucursal_o_particular)
+
 class ReparacionAdmin(admin.ModelAdmin):
     list_display = ('fecha_ingreso', 'fecha_estimada', 'descripcion_reparacion', 'producto')
     inlines = [BitacoraInline]
@@ -107,15 +115,6 @@ class BitacoraAdmin(admin.ModelAdmin):
 
 class MyUserAdmin(admin.ModelAdmin):
     list_display = ('email', 'sucursal_o_particular', 'active', 'admin')
-
-
-    
-    def get_queryset(self, request):
-        qs = super(ProductoAdmin, self).get_queryset(request)
-        if request.user.is_superuser or request.user.nivel == '1':
-            return qs
-
-        #return qs.filter(sucursal_o_particular = request.user.sucursal_o_particular)
 
 class MoUserAdmin(admin.ModelAdmin):
     add_form_template = 'admin/auth/user/add_form.html'
