@@ -20,10 +20,38 @@ from django.utils.html import escape
 from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.contrib.auth.forms import *
+from django.contrib.auth.models import Permission
 
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
+class MyUserCreationForm(forms.ModelForm):
+    """A form for creating new users. Includes all the required
+    fields, plus a repeated password."""
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
+
+    class Meta:
+        model = MyUser
+        fields = ()
+
+    def clean_password2(self):
+        # Check that the two password entries match
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords don't match")
+        return password2
+
+    def save(self, commit=True):
+        # Save the provided password in hashed format
+        user = super(MyUserCreationForm, self).save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
 
 class ProductoInline(admin.TabularInline):
     model = Producto
@@ -46,8 +74,33 @@ class SucursalOParticularAdmin (admin.ModelAdmin):
     inlines = [ProductoInline]
 
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('sucursal_o_particular', 'nombre', 'modelo', 'diagnostico', 'presupuesto_detallado', 'estado')
+    search_fields = ('sucursal_o_particular', 'nombre', 'modelo')
+    list_filter = ('estado',)
     inlines = [ReparacionInline]
+    
+    def get_list_display(self, request):
+        if request.user.is_superuser or request.user.nivel == '1':
+            return ('sucursal_o_particular', 'nombre', 'modelo', 'estado')
+        else:
+            return ('nombre', 'modelo', 'estado')
+    
+    def get_fields(self, request, obj = None):
+        if obj:
+            if request.user.is_superuser or request.user.nivel == '1':
+                return ('sucursal_o_particular','nombre','modelo','estado', 'presupuesto_detallado','diagnostico')
+            elif request.user.nivel == '2':
+                return ('nombre', 'modelo','estado','presupuesto_detallado', 'diagnostico')
+            else:
+                return('nombre', 'modelo', 'estado')
+        else:
+            return ('sucursal_o_particular','nombre','modelo','estado', 'presupuesto_detallado','diagnostico')
+
+    def get_queryset(self, request):
+        qs = super(ProductoAdmin, self).get_queryset(request)
+        if request.user.is_superuser or request.user.nivel == '1':
+            return qs
+
+        return qs.filter(sucursal_o_particular = request.user.sucursal_o_particular)
 
 class ReparacionAdmin(admin.ModelAdmin):
     list_display = ('fecha_ingreso', 'fecha_estimada', 'descripcion_reparacion', 'producto')
@@ -63,39 +116,38 @@ class BitacoraAdmin(admin.ModelAdmin):
 class MyUserAdmin(admin.ModelAdmin):
     list_display = ('email', 'sucursal_o_particular', 'active', 'admin')
 
-
-    
-    #def get_queryset(self, request):
-     #   qs = super(ProductoAdmin, self).get_queryset(request)
-      #  if request.user.is_superuser or User.objects.filter(pk=request.user.id, groups__name='Técnico').exists():
-       #     return qs
-
-        #return qs.filter(sucursal_o_particular = request.user.sucursal_o_particular)
-
 class MoUserAdmin(admin.ModelAdmin):
     add_form_template = 'admin/auth/user/add_form.html'
     change_user_password_template = None
     fieldsets = (
-        (None, {'fields': ('email', 'password',)}),
+        (None, {'fields': ('email', 'password','sucursal_o_particular')}),
         (_('Permissions'), {
-            'fields': ('is_active',),
+            'fields': ('is_active','nivel',),
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2'),
+            'fields': ('email', 'password1', 'password2', 'nivel', 'sucursal_o_particular'),
         }),
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['nivel','sucursal_o_particular']
+        else:
+            return []
+
     form = UserChangeForm
-    add_form = UserCreationForm
+    add_form = MyUserCreationForm
     change_password_form = AdminPasswordChangeForm
     list_display = ('email', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('email',)
     ordering = ('email',)
-    filter_horizontal = ('groups', 'user_permissions',)
+
+
 
     def get_fieldsets(self, request, obj=None):
         if not obj:
@@ -238,8 +290,8 @@ class MoUserAdmin(admin.ModelAdmin):
         return super().response_add(request, obj, post_url_continue)
 
 
-#admin.site.unregister(User)
-#admin.site.unregister(Group)
+
+admin.site.unregister(Group)
 admin.site.register(MyUser, MoUserAdmin)
 admin.site.register(Bitacora,BitacoraAdmin)
 admin.site.register(SucursalOParticular,SucursalOParticularAdmin)

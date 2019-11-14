@@ -4,6 +4,8 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.contrib.auth.models import Permission
+from django.db.models.signals import post_save
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
@@ -36,7 +38,7 @@ class Producto(models.Model):
             ('10', 'Entregada sin reparar'),
     )
 
-    sucursal_o_particular = models.ForeignKey(SucursalOParticular,on_delete = models.CASCADE, verbose_name = 'Sucursal o Particular')
+    sucursal_o_particular = models.ForeignKey(SucursalOParticular,on_delete = models.CASCADE, blank = True, null = True, verbose_name = 'Sucursal o Particular')
     nombre = models.CharField(max_length=30)
     modelo = models.CharField(max_length=30,null=True,blank=True)
     diagnostico = models.TextField()
@@ -47,6 +49,9 @@ class Producto(models.Model):
         return self.nombre
 
 class Reparacion(models.Model):
+
+    class Meta:
+        verbose_name_plural = 'Reparaciones'
     fecha_ingreso = models.DateField(auto_now = True)
     fecha_estimada = models.DateField(null = True)
     descripcion_reparacion = models.TextField()
@@ -70,12 +75,6 @@ class MyUserManager(BaseUserManager):
             email = self.normalize_email(email)
             )
         user_obj.set_password(password)
-        if nivel == '2' or nivel == '3':
-            grupo = Group.objects.get(name='Vidente') 
-            grupo.user_set.add(user_obj)
-        elif nivel == '1':
-            grupo = Group.objects.get(name= 'Técnico')
-            grupo.user_set.add(user_obj)
         user_obj.is_staff = True
         user_obj.is_active = True
         user_obj.save(using=self.db)
@@ -95,13 +94,13 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
-    #NIVELES = [
-     #   ('1', 'Técnico'),
-      #  ('2', 'Dueño'),
-       # ('3', 'Empleado de Sucursal')]
+    NIVELES = [
+        ('1', 'Técnico'),
+        ('2', 'Dueño'),
+        ('3', 'Empleado de Sucursal')]
 
     sucursal_o_particular = models.ForeignKey(SucursalOParticular, on_delete = models.CASCADE, null = True, blank = True)
-    #nivel = models.CharField(max_length=1, choices=NIVELES, null = True)
+    nivel = models.CharField(max_length=1, choices=NIVELES, null = True)
 
     email = models.EmailField(_('email address'), blank=False, unique = True)
     is_staff = models.BooleanField(
@@ -137,4 +136,14 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         """Return the short name for the user."""
         return self.email
+
+def set_perms(sender, instance, created, **kwargs):
+    if created:
+        if instance.nivel == '2' or instance.nivel == '3': 
+            permissions = [Permission.objects.get(name='Can view producto'),]
+            instance.user_permissions.set(permissions)
+        elif instance.nivel == '1':
+            permissions = Permission.objects.filter(name__in = ['Can change producto', 'Can add bitacora', 'Can change bitacora', 'Can add reparacion','Can change reparacion','Can delete reparacion'])
+            instance.user_permissions.set(permissions)
+post_save.connect(set_perms, sender = MyUser)
 
