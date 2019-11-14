@@ -25,13 +25,14 @@ SECRET_KEY = '(5cv3t-@%bu#%b2v@+6(z!^gl55^w9m8h(w3i&$72m52==zx9t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    #'jet',
+    #'jet.dashboard',
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',          #Core authentication framework and its default models.
     'django.contrib.contenttypes',  #Django content type system (allows permissions to be associated with models).
