@@ -81,8 +81,8 @@ class SucursalOParticularAdmin (admin.ModelAdmin):
     inlines = [ProductoInline]
 
 class ProductoAdmin(admin.ModelAdmin):
-    search_fields = ('sucursal_o_particular', 'nombre', 'modelo')
-    list_filter = ('estado',)
+    search_fields = ('sucursal_o_particular__nombre', 'nombre', 'modelo')
+    list_filter = ('estado','nombre')
     inlines = [ReparacionInline]
 
     def get_list_display(self, request):
