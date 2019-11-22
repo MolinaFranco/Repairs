@@ -143,7 +143,7 @@ class MoUserAdmin(admin.ModelAdmin):
     add_form = MyUserCreationForm
     change_password_form = AdminPasswordChangeForm
     list_display = ('email', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    list_filter = ('is_active',)
     search_fields = ('email',)
     ordering = ('email',)
 

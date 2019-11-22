@@ -52,10 +52,14 @@ class Reparacion(models.Model):
 
     class Meta:
         verbose_name_plural = 'Reparaciones'
+    titulo = models.CharField(verbose_name = 'título', blank = False, null = False, max_length = 50)
     fecha_ingreso = models.DateField(auto_now = True)
     fecha_estimada = models.DateField(null = True)
     descripcion_reparacion = models.TextField()
     producto = models.ForeignKey(Producto, on_delete = models.CASCADE)
+
+    def __str__(self):
+        return self.titulo
 
 class Bitacora(models.Model):
     fecha = models.DateField()
