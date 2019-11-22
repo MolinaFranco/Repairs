@@ -20,12 +20,18 @@ from django.utils.html import escape
 from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Count
+from django.db.models.functions import TruncDay
+import json
 from django.contrib.auth.forms import *
 from django.contrib.auth.models import Permission
 
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
+admin.site.site_header = _("Repairs Administration")
+admin.site.site_title = _("My Repairs Admin")
 class MyUserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
@@ -53,6 +59,7 @@ class MyUserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
 class ProductoInline(admin.TabularInline):
     model = Producto
     extra = 0
@@ -74,16 +81,16 @@ class SucursalOParticularAdmin (admin.ModelAdmin):
     inlines = [ProductoInline]
 
 class ProductoAdmin(admin.ModelAdmin):
-    search_fields = ('sucursal_o_particular', 'nombre', 'modelo')
-    list_filter = ('estado',)
+    search_fields = ('sucursal_o_particular__nombre', 'nombre', 'modelo')
+    list_filter = ('estado','nombre')
     inlines = [ReparacionInline]
-    
+
     def get_list_display(self, request):
         if request.user.is_superuser or request.user.nivel == '1':
             return ('sucursal_o_particular', 'nombre', 'modelo', 'estado')
         else:
             return ('nombre', 'modelo', 'estado')
-    
+
     def get_fields(self, request, obj = None):
         if obj:
             if request.user.is_superuser or request.user.nivel == '1':
@@ -105,6 +112,21 @@ class ProductoAdmin(admin.ModelAdmin):
 class ReparacionAdmin(admin.ModelAdmin):
     list_display = ('fecha_ingreso', 'fecha_estimada', 'descripcion_reparacion', 'producto')
     inlines = [BitacoraInline]
+    change_list_template = 'graficos.html'
+
+    def changelist_view(self, request, extra_context=None):
+
+        chart_data = (
+            Reparacion.objects.annotate(date=TruncDay("fecha_estimada"))
+            .values("date")
+            .annotate(y=Count("id"))
+            .order_by("-date")
+        )
+
+        as_json = json.dumps(list(chart_data), cls=DjangoJSONEncoder)
+        extra_context = extra_context or {"chart_data": as_json}
+
+        return super().changelist_view(request, extra_context=extra_context)
 
 class EmpresaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'cuit')
@@ -115,7 +137,6 @@ class BitacoraAdmin(admin.ModelAdmin):
 
 class MyUserAdmin(admin.ModelAdmin):
     list_display = ('email', 'sucursal_o_particular', 'active', 'admin')
-
 class MoUserAdmin(admin.ModelAdmin):
     add_form_template = 'admin/auth/user/add_form.html'
     change_user_password_template = None
