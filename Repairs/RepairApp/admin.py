@@ -83,6 +83,7 @@ class SucursalOParticularAdmin (admin.ModelAdmin):
 class ProductoAdmin(admin.ModelAdmin):
     search_fields = ('sucursal_o_particular__nombre', 'nombre', 'modelo')
     list_filter = ('estado','nombre')
+    change_list_template = "boton.html"
     inlines = [ReparacionInline]
 
     def get_list_display(self, request):
