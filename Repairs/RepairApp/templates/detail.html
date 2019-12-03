@@ -5,28 +5,29 @@
     <meta name="viewport" content="widtd=device-widtd, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Reporte de productos seleccionados</title>
-    <style>
-    .constainer{
-        margin: 10px 0px;
-        display: flexbox;
-        flex-direction:column;
-        justify-content: center;
-        width:100%;
-        border-radius: 2em;
-    }
-    table, table td{
-        border: 1px solid black;
-        border-collapse:collapse;
-    }
-    .first{
-        background-color:black;
-        color:white;
-        padding: 3px;
-        text-align: center;
-        text-emphasis-style: bold;
-    }
-    </style>
 </head>
+<!-- El modulo que convierte esto a pdf hace cualquier cosa jaja -->
+<style>
+        .table {
+        border-collapse: collapse;
+        border-radius: 1em;
+        overflow: hidden;
+        }
+    
+        th, td {
+        padding: 1em;
+        background: #ddd;
+        border-bottom: 2px solid white;
+        }
+        .first{
+            background-color:black;
+            color:white;
+            padding: 3px;
+            text-align: center;
+            text-emphasis-style: bold;
+        }
+        </style>
+
 <body>
     <table class="container">
         <tr>

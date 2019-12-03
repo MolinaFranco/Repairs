@@ -33,6 +33,6 @@ def renderizar_pdf(template, queryset):
     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
 
     if not pdf.err:
-        return HttpResponse(html)
+        #return HttpResponse(html)
         return HttpResponse(result.getvalue(), content_type='application/pdf')
     return None
