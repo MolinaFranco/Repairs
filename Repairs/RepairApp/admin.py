@@ -26,6 +26,8 @@ from django.db.models.functions import TruncDay
 import json
 from django.contrib.auth.forms import *
 from django.contrib.auth.models import Permission
+from django.shortcuts import redirect
+from RepairApp.utils import renderizar_pdf
 
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
@@ -109,6 +111,10 @@ class ProductoAdmin(admin.ModelAdmin):
             return qs
 
         return qs.filter(sucursal_o_particular = request.user.sucursal_o_particular)
+    actions = ['generar_reporte']
+    
+    def generar_reporte(self, request, queryset):
+        return renderizar_pdf('detail.html', queryset)
 
 class ReparacionAdmin(admin.ModelAdmin):
     list_display = ('fecha_ingreso', 'fecha_estimada', 'descripcion_reparacion', 'producto')

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="widtd=device-widtd, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Reporte de productos seleccionados</title>
+    <style>
+    .constainer{
+        margin: 10px 0px;
+        display: flexbox;
+        flex-direction:column;
+        justify-content: center;
+        width:100%;
+        border-radius: 2em;
+    }
+    table, table td{
+        border: 1px solid black;
+        border-collapse:collapse;
+    }
+    .first{
+        background-color:black;
+        color:white;
+        padding: 3px;
+        text-align: center;
+        text-emphasis-style: bold;
+    }
+    </style>
+</head>
+<body>
+    <table class="container">
+        <tr>
+            <td class="first">NOMBRE</td>
+            <td class="first">MODELO</td>
+            <td class="first">ESTADO</td>
+            <td class="first">DUEÑO/SUCURSAL</td>
+        </tr>
+        {% for obj in objects %}
+        <tr>
+            <td>{{obj.nombre}}</td>
+            <td>{{obj.modelo}}</td>
+            <td>{{obj.estado}}</td>
+            <td>{{obj.cliente}}</td>
+        </tr>
+    {% endfor %}
+        
+    </table>
+    
+    
+        
+
+    
+</body>
+</html>

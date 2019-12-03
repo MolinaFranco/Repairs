@@ -18,9 +18,14 @@ from reportlab.platypus import (
         TableStyle,
         Paragraph)
 from .models import Producto
+from django.http import HttpResponse
+
+def detailPdf(request, id, *args, **kwargs):
+    queryset = Vehiculo.objects.filter(id=id)
+    print(queryset)
+    return renderizar_pdf('pdf.html', queryset)
 
 class ReportePersonasPDF(View):
-
     def renombrar(self,x):
         estado_p = ""
         if x == "1":
