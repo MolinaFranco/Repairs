@@ -112,7 +112,7 @@ class ProductoAdmin(admin.ModelAdmin):
 
         return qs.filter(sucursal_o_particular = request.user.sucursal_o_particular)
     actions = ['generar_reporte']
-    
+
     def generar_reporte(self, request, queryset):
         return renderizar_pdf('detail.html', queryset)
 
@@ -322,6 +322,7 @@ class MoUserAdmin(admin.ModelAdmin):
 admin.site.unregister(Group)
 admin.site.register(MyUser, MoUserAdmin)
 admin.site.register(Bitacora,BitacoraAdmin)
+admin.site.unregister(Bitacora)
 admin.site.register(SucursalOParticular,SucursalOParticularAdmin)
 admin.site.register(Reparacion,ReparacionAdmin)
 admin.site.register(Producto,ProductoAdmin)
