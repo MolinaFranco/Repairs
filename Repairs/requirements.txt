@@ -12,7 +12,7 @@ mysql-connector==2.2.9
 mysqlclient==1.4.5
 odfpy==1.4.0
 openpyxl==3.0.2
-Pillow==6.2.1
+Pillow==9.0.1
 pkg-resources==0.0.0
 PyPDF2==1.26.0
 pytz==2019.1
